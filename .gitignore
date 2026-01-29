@@ -1,0 +1,8 @@
+*.db
+*.pyc
+__pycache__/
+test_reports/
+.env
+venv/
+.vscode/
+.idea/

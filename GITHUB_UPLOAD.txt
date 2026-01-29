@@ -1,0 +1,92 @@
+ИНСТРУКЦИЯ ПО ЗАГРУЗКЕ В GITHUB
+=================================
+
+ВАРИАНТ 1: Через командную строку (если Git установлен)
+--------------------------------------------------------
+
+1. Открой командную строку в папке проекта
+
+2. Выполни команды по порядку:
+
+git init
+git add .
+git commit -m "Initial commit: Test monitoring system"
+git branch -M main
+git remote add origin https://github.com/isdj12/-.git
+git push -u origin main
+
+
+ВАРИАНТ 2: Через GitHub Desktop (рекомендуется)
+------------------------------------------------
+
+1. Скачай и установи GitHub Desktop:
+   https://desktop.github.com/
+
+2. Открой GitHub Desktop
+
+3. File -> Add Local Repository -> выбери папку проекта
+
+4. Нажми "Publish repository"
+
+5. Выбери репозиторий "isdj12/-"
+
+6. Нажми "Push origin"
+
+
+ВАРИАНТ 3: Через веб-интерфейс GitHub
+--------------------------------------
+
+1. Открой https://github.com/isdj12/-
+
+2. Нажми "Add file" -> "Upload files"
+
+3. Перетащи все файлы из папки проекта (кроме __pycache__, .pytest_cache, test_history.db)
+
+4. Напиши commit message: "Initial commit"
+
+5. Нажми "Commit changes"
+
+
+ВАРИАНТ 4: Установить Git
+--------------------------
+
+1. Скачай Git для Windows:
+   https://git-scm.com/download/win
+
+2. Установи с настройками по умолчанию
+
+3. Перезапусти PowerShell
+
+4. Используй ВАРИАНТ 1
+
+
+ФАЙЛЫ ДЛЯ ЗАГРУЗКИ:
+-------------------
+[OK] config.py
+[OK] core.py
+[OK] telegram_bot.py
+[OK] monitor.py
+[OK] demo.py
+[OK] requirements.txt
+[OK] README.md
+[OK] QUICKSTART.md
+[OK] STRUCTURE.txt
+[OK] .gitignore
+[OK] run_simulation.bat
+[OK] run_simulation.sh
+[OK] test_simulation/ (вся папка)
+
+НЕ ЗАГРУЖАТЬ:
+-------------
+[X] __pycache__/
+[X] .pytest_cache/
+[X] test_history.db
+[X] test_reports/
+[X] GITHUB_UPLOAD.txt (этот файл)
+
+
+ПРОВЕРКА ПОСЛЕ ЗАГРУЗКИ:
+------------------------
+1. Открой https://github.com/isdj12/-
+2. Убедись, что все файлы загружены
+3. Проверь, что README.md отображается на главной странице
