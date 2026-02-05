@@ -1,6 +1,3 @@
-"""
-Демонстрация работы без Telegram
-"""
 from core import ReportParser, ErrorAnalyzer, TestDatabase
 
 
