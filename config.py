@@ -1,8 +1,8 @@
 import os
 
 # Telegram Bot Configuration
-BOT_TOKEN = os.getenv('BOT_TOKEN', 'YOUR_BOT_TOKEN_HERE')
-CHAT_ID = os.getenv('CHAT_ID', 'YOUR_CHAT_ID_HERE')
+BOT_TOKEN = os.getenv('BOT_TOKEN', '8570072935:AAGNnayMmRZa9xnkco43NS4hf1aOxSrF2sw')
+CHAT_ID = os.getenv('CHAT_ID', '1566108855')
 
 # Database Configuration
 DB_PATH = 'test_history.db'

@@ -1,5 +1,6 @@
+"""
 Основной модуль: парсер, анализатор и база данных
-
+"""
 import json
 import sqlite3
 import re
@@ -113,22 +114,28 @@ class ErrorAnalyzer:
 # ПАРСЕР ОТЧЕТОВ
 
 class ReportParser:
+    """Читает отчеты pytest и извлекает информацию о тестах"""
+    
     @staticmethod
     def parse_pytest_json(report_path):
+        """Читает JSON файл и возвращает список тестов"""
         try:
+            # Открываем файл отчета
             with open(report_path, 'r', encoding='utf-8') as f:
                 data = json.load(f)
             
             results = []
-            tests = data.get('tests', [])
+            tests = data.get('tests', [])  # Берем список тестов
             
+            # Обрабатываем каждый тест
             for test in tests:
                 test_info = {
-                    'name': test.get('nodeid', 'Unknown'),
-                    'status': 'PASSED' if test.get('outcome') == 'passed' else 'FAILED',
-                    'error_message': None
+                    'name': test.get('nodeid', 'Unknown'),  # Имя теста
+                    'status': 'PASSED' if test.get('outcome') == 'passed' else 'FAILED',  # Прошел или упал
+                    'error_message': None  # Пока ошибки нет
                 }
                 
+                # Если тест упал - берем текст ошибки
                 if test_info['status'] == 'FAILED':
                     call_info = test.get('call', {})
                     test_info['error_message'] = call_info.get('longrepr', 'No error details')
@@ -142,6 +149,7 @@ class ReportParser:
     
     @staticmethod
     def get_latest_report():
+        """Возвращает путь к файлу отчета, если он есть"""
         report_path = os.path.join(REPORTS_DIR, REPORT_FILE)
         if os.path.exists(report_path):
             return report_path

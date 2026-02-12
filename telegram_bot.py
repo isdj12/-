@@ -23,7 +23,8 @@ class TesterBot:
                 keyboard=[
                     [KeyboardButton(text="Последний отчет")],
                     [KeyboardButton(text="Топ проблем")],
-                    [KeyboardButton(text="Что проверить?")]
+                    [KeyboardButton(text="Что проверить?")],
+                    [KeyboardButton(text="Очистить БД")]
                 ],
                 resize_keyboard=True
             )
@@ -69,6 +70,26 @@ class TesterBot:
                 "3. Проверь логи за последний час\n"
                 "4. Убедись, что нет проблем с сетью"
             )
+        
+        @self.dp.message(lambda message: message.text == "Очистить БД")
+        async def clear_database(message: types.Message):
+            try:
+                # Получаем количество записей до очистки
+                cursor = self.db.conn.cursor()
+                cursor.execute('SELECT COUNT(*) FROM test_runs')
+                count_before = cursor.fetchone()[0]
+                
+                # Очищаем базу данных
+                cursor.execute('DELETE FROM test_runs')
+                self.db.conn.commit()
+                
+                await message.answer(
+                    f"База данных очищена!\n\n"
+                    f"Удалено записей: {count_before}\n\n"
+                    f"Теперь можешь запускать новые тесты."
+                )
+            except Exception as e:
+                await message.answer(f"Ошибка при очистке БД: {e}")
     
     async def send_test_notification(self, test_name, status, error_info=None, failure_count=0):
         if status == "PASSED":
