@@ -19,12 +19,15 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+pip-log.txt
+pip-delete-this-directory.txt
 
 # Virtual Environment
 venv/
 ENV/
 env/
 .venv
+virtualenv/
 
 # IDE
 .vscode/
@@ -32,6 +35,9 @@ env/
 *.swp
 *.swo
 *~
+.project
+.pydevproject
+.settings/
 
 # Testing
 .pytest_cache/
@@ -39,31 +45,52 @@ env/
 htmlcov/
 .tox/
 .hypothesis/
+.mypy_cache/
+.dmypy.json
+dmypy.json
 
-# Database
+# Database (содержит историю тестов)
 *.db
 *.sqlite
 *.sqlite3
 test_history.db
 
-# Reports
+# Reports (генерируются автоматически)
 test_reports/
 *.json
+report.json
 
-# Configuration (содержит токены!)
+# Configuration (содержит токены и ключи!)
 config.py
 monitor_config.json
 
 # Logs
 *.log
+logs/
 
 # OS
 .DS_Store
 Thumbs.db
 desktop.ini
+*.lnk
 
 # Temporary files
 *.tmp
 *.bak
+*.backup
 *.swp
+*~
 test_bot_buttons.py
+
+# Ollama (если локально)
+.ollama/
+
+# Старые папки (если остались)
+my_tests/
+test_website/
+user_tests/
+
+# Документация временная
+ГОТОВО.md
+ЗАПУСК.md
+SETUP.md

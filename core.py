@@ -5,8 +5,17 @@ import json
 import sqlite3
 import re
 from datetime import datetime
-from config import DB_PATH, REPORTS_DIR, REPORT_FILE
+from config import DB_PATH, REPORTS_DIR, REPORT_FILE, USE_AI_ANALYSIS
 import os
+import requests
+
+# Импорт для AI провайдеров
+try:
+    from config import AI_PROVIDER, AI_MODEL, OLLAMA_BASE_URL
+except ImportError:
+    AI_PROVIDER = 'ollama'
+    AI_MODEL = 'llama3.2'
+    OLLAMA_BASE_URL = 'http://localhost:11434'
 
 # АНАЛИЗАТОР ОШИБОК
 
@@ -109,6 +118,121 @@ class ErrorAnalyzer:
             return '[ВНИМАНИЕ]'
         else:
             return '[РАЗОВАЯ ОШИБКА]'
+
+
+# AI-АНАЛИЗАТОР ОШИБОК
+
+class AIErrorAnalyzer:
+    
+    def __init__(self):
+        self.client = None
+        
+        if AI_PROVIDER == 'ollama':
+            try:
+                # Проверяем доступность Ollama
+                response = requests.get(f"{OLLAMA_BASE_URL}/api/tags")
+                if response.status_code == 200:
+                    self.client = "ollama"
+                    print(f"✓ Ollama активирован с моделью {AI_MODEL}")
+                else:
+                    print("⚠️ Ollama не отвечает. Запусти: ollama serve")
+            except Exception as e:
+                print(f"⚠️ Ошибка подключения к Ollama: {e}")
+                print("Запусти: ollama serve")
+        else:
+            print("⚠️ AI провайдер не настроен")
+    
+    def analyze_error(self, error_message, test_name=None):
+        
+        if not self.client or not USE_AI_ANALYSIS:
+            return {
+                'type': 'unknown',
+                'diagnosis': 'AI не настроен',
+                'recommendations': ['Запусти Ollama: ollama serve']
+            }
+        
+        try:
+            prompt = self._build_prompt(error_message, test_name)
+            
+            # Запрос к Ollama API
+            response = requests.post(
+                f"{OLLAMA_BASE_URL}/api/generate",
+                json={
+                    "model": AI_MODEL,
+                    "prompt": prompt,
+                    "stream": False
+                },
+                timeout=30
+            )
+            
+            if response.status_code == 200:
+                ai_response = response.json().get('response', '')
+                return self._parse_ai_response(ai_response)
+            else:
+                return {
+                    'type': 'unknown',
+                    'diagnosis': 'Ошибка AI',
+                    'recommendations': ['Проверь статус Ollama']
+                }
+            
+        except Exception as e:
+            print(f"⚠️ Ошибка AI-анализа: {e}")
+            return {
+                'type': 'unknown',
+                'diagnosis': f'Ошибка AI: {str(e)}',
+                'recommendations': ['Проверь что Ollama запущен: ollama serve']
+            }
+    
+    def _build_prompt(self, error_message, test_name):
+        prompt = f"""Проанализируй ошибку автотеста и дай конкретные рекомендации.
+
+Тест: {test_name or 'Неизвестный тест'}
+
+Ошибка:
+{error_message[:1500]}
+
+Ответь в формате:
+ДИАГНОЗ: [краткое описание проблемы в одно предложение]
+РЕКОМЕНДАЦИИ:
+- [конкретная рекомендация 1]
+- [конкретная рекомендация 2]
+- [конкретная рекомендация 3]
+ТИП: [timeout/connection/auth/not_found/server_error/assertion/unknown]"""
+        return prompt
+    
+    def _parse_ai_response(self, ai_response):
+        try:
+            lines = ai_response.strip().split('\n')
+            diagnosis = ""
+            recommendations = []
+            error_type = "unknown"
+            
+            for line in lines:
+                line = line.strip()
+                if line.startswith('ДИАГНОЗ:'):
+                    diagnosis = line.replace('ДИАГНОЗ:', '').strip()
+                elif line.startswith('ТИП:'):
+                    error_type = line.replace('ТИП:', '').strip().lower()
+                elif line.startswith('-'):
+                    recommendations.append(line[1:].strip())
+            
+            return {
+                'type': error_type,
+                'diagnosis': diagnosis or 'AI не смог определить проблему',
+                'recommendations': recommendations if recommendations else ['Проверь логи подробнее'],
+                'ai_powered': True
+            }
+        except Exception as e:
+            print(f"⚠️ Ошибка парсинга AI-ответа: {e}")
+            return {
+                'type': 'unknown',
+                'diagnosis': 'Ошибка парсинга ответа AI',
+                'recommendations': ['Попробуй еще раз']
+            }
+    
+    @staticmethod
+    def get_severity(failure_count):
+        return ErrorAnalyzer.get_severity(failure_count)
 
 
 # ПАРСЕР ОТЧЕТОВ
