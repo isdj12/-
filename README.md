@@ -3,69 +3,6 @@
 AI-МОЗГ для автоматизации тестирования
 Умный ассистент для запуска тестов через Telegram с AI-анализом ошибок на базе Ollama.
 
-Возможности
-Управление через Telegram бота
-
-Автоматический запуск pytest тестов
-
-AI-анализ ошибок через локальную модель Ollama (llama3.2)
-
-Статистика и история тестов
-
-Конкретные рекомендации по исправлению
-
-Полностью бесплатно и работает офлайн
-
-Быстрый старт
-1. Установка зависимостей
-Bash
-pip install -r requirements.txt
-2. Настройка
-Скопируйте config.example.py в config.py и заполни:
-
-Python
-BOT_TOKEN = 'твой_токен_от_BotFather'  # Получите у @BotFather
-CHAT_ID = 'твой_chat_id'                # Получите у @userinfobot
-3. Запуск Ollama
-Bash
-ollama serve
-4. Запуск AI-МОЗГА
-Bash
-python3 ai_brain.py
-При запуске выберите проект:
-
-Текущая директория (ai-mozg)
-
-Другой проект (укажите путь)
-
-Родительская директория
-
-Структура проекта
-ai-mozg/
-├── ai_brain.py          # Главный файл
-├── core.py              # AI-анализатор и парсер
-├── config.py            # Настройки (не в git)
-├── tests/               # Папка для тестов
-│   └── test_example.py
-├── test_reports/        # Отчеты (не в git)
-└── test_history.db      # База данных (не в git)
-Создание тестов
-Создавайте файлы test_*.py в папке tests/:
-
-Python
-import requests
-
-def test_my_website():
-    """Проверка доступности сайта"""
-    response = requests.get("https://example.com")
-    assert response.status_code == 200
-
-def test_api_response():
-    """Проверка API"""
-    response = requests.get("https://api.example.com/data")
-    assert response.status_code == 200
-    data = response.json()
-    assert 'result' in data
 Команды в Telegram
 После запуска отправьте боту /start и используйте кнопки:
 
