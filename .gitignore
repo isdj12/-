@@ -45,24 +45,20 @@ virtualenv/
 htmlcov/
 .tox/
 .hypothesis/
-.mypy_cache/
-.dmypy.json
-dmypy.json
 
-# Database (содержит историю тестов)
+# Database
 *.db
 *.sqlite
 *.sqlite3
 test_history.db
 
-# Reports (генерируются автоматически)
+# Reports
 test_reports/
 *.json
 report.json
 
-# Configuration (содержит токены и ключи!)
+# Configuration (содержит токены!)
 config.py
-monitor_config.json
 
 # Logs
 *.log
@@ -72,25 +68,10 @@ logs/
 .DS_Store
 Thumbs.db
 desktop.ini
-*.lnk
 
-# Temporary files
-*.tmp
-*.bak
-*.backup
-*.swp
-*~
-test_bot_buttons.py
+# Ollama - НЕ ПУШИТЬ!
+ollama_data/
+ollama_local/ollama
 
-# Ollama (если локально)
-.ollama/
-
-# Старые папки (если остались)
-my_tests/
-test_website/
-user_tests/
-
-# Документация временная
-ГОТОВО.md
-ЗАПУСК.md
-SETUP.md
+# Git
+.git/

@@ -32,23 +32,25 @@ class AIBrain:
         async def cmd_start(message: types.Message):
             keyboard = ReplyKeyboardMarkup(
                 keyboard=[
-                    [KeyboardButton(text="🚀 Запустить тесты")],
-                    [KeyboardButton(text="📊 Последний отчет"), KeyboardButton(text="🔥 Топ проблем")],
-                    [KeyboardButton(text="🤖 AI анализ"), KeyboardButton(text="📈 Статистика")],
-                    [KeyboardButton(text="🗑️ Очистить БД")]
+                    [KeyboardButton(text="Запустить тесты")],
+                    [KeyboardButton(text="AI сканирование сайта")],
+                    [KeyboardButton(text="Последний отчет"), KeyboardButton(text="Топ проблем")],
+                    [KeyboardButton(text="AI анализ"), KeyboardButton(text="Статистика")],
+                    [KeyboardButton(text="Очистить БД")]
                 ],
                 resize_keyboard=True
             )
             await message.answer(
-                f"🧠 AI-МОЗГ АКТИВИРОВАН\n\n"
-                f"📁 Проект: {self.project_path}\n"
-                f"🧪 Папка тестов: {self.current_test_folder}\n\n"
+                f"AI-МОЗГ АКТИВИРОВАН\n\n"
+                f"Проект: {self.project_path}\n"
+                f"Папка тестов: {self.current_test_folder}\n\n"
                 f"Команды:\n"
-                f"🚀 Запустить тесты - запуск всех тестов\n"
-                f"📊 Последний отчет - результаты за 24ч\n"
-                f"🔥 Топ проблем - самые падающие тесты\n"
-                f"🤖 AI анализ - глубокий анализ через Ollama\n"
-                f"📈 Статистика - общая статистика",
+                f"Запустить тесты - запуск всех тестов\n"
+                f"AI сканирование - нейронка проанализирует сайт\n"
+                f"Последний отчет - результаты за 24ч\n"
+                f"Топ проблем - самые падающие тесты\n"
+                f"AI анализ - глубокий анализ через Ollama\n"
+                f"Статистика - общая статистика",
                 reply_markup=keyboard
             )
         
@@ -59,26 +61,30 @@ class AIBrain:
             
             text = message.text.strip()
             
-            if text in ["Запустить тесты", "🚀 Запустить тесты"]:
+            if text in ["Запустить тесты"]:
                 if self.is_running_tests:
-                    await message.answer("⏳ Тесты уже выполняются, подожди...")
+                    await message.answer("Тесты уже выполняются, подожди...")
                     return
-                await message.answer(f"🚀 Запускаю тесты в: {self.project_path}/tests/")
+                await message.answer(f"Запускаю тесты в: {self.project_path}/tests/")
                 await self.run_tests_and_analyze()
             
-            elif text in ["Последний отчет", "📊 Последний отчет"]:
+            elif text in ["AI сканирование сайта"]:
+                await message.answer("Запускаю AI сканирование сайта...")
+                await self.ai_scan_website()
+            
+            elif text in ["Последний отчет"]:
                 await self.send_last_report()
             
-            elif text in ["Топ проблем", "🔥 Топ проблем"]:
+            elif text in ["Топ проблем"]:
                 await self.send_top_problems()
             
-            elif text in ["AI анализ", "🤖 AI анализ"]:
+            elif text in ["AI анализ"]:
                 await self.send_ai_deep_analysis()
             
-            elif text in ["Статистика", "📈 Статистика"]:
+            elif text in ["Статистика"]:
                 await self.send_statistics()
             
-            elif text in ["Очистить БД", "🗑️ Очистить БД"]:
+            elif text in ["Очистить БД"]:
                 await self.clear_database()
             
             else:
@@ -97,7 +103,7 @@ class AIBrain:
             reports_dir = os.path.join(ai_mozg_dir, 'test_reports')
             os.makedirs(reports_dir, exist_ok=True)
             
-            await self.bot.send_message(CHAT_ID, f"🚀 Запускаю тесты в проекте:\n{self.project_path}")
+            await self.bot.send_message(CHAT_ID, f"Запускаю тесты в проекте:\n{self.project_path}")
             
             # Путь к папке tests в выбранном проекте
             test_path = os.path.join(self.project_path, 'tests')
@@ -115,7 +121,7 @@ class AIBrain:
             if not os.path.exists(report_path):
                 await self.bot.send_message(
                     CHAT_ID,
-                    "⚠️ Отчет не найден\n\n"
+                    "Отчет не найден\n\n"
                     "Проверь:\n"
                     "1. pytest установлен\n"
                     "2. pytest-json-report установлен\n"
@@ -218,6 +224,112 @@ class AIBrain:
         
         await self.bot.send_message(CHAT_ID, text)
     
+    async def ai_scan_website(self):
+        """AI сканирование сайта - нейронка анализирует структуру и проблемы"""
+        try:
+            import requests
+            from urllib.parse import urljoin, urlparse
+            
+            await self.bot.send_message(CHAT_ID, "Ищу сайт для анализа...")
+            
+            website_url = None
+            app_file = os.path.join(self.project_path, 'app.py')
+            
+            if os.path.exists(app_file):
+                website_url = "http://127.0.0.1:5000"
+            
+            if not website_url:
+                await self.bot.send_message(
+                    CHAT_ID,
+                    "Сайт не найден\n\n"
+                    "Убедись что:\n"
+                    "1. Сайт запущен (python website/app.py)\n"
+                    "2. Доступен на http://127.0.0.1:5000"
+                )
+                return
+            
+            await self.bot.send_message(CHAT_ID, f"Сканирую: {website_url}")
+            
+            try:
+                response = requests.get(website_url, timeout=5)
+                status_code = response.status_code
+            except Exception as e:
+                await self.bot.send_message(
+                    CHAT_ID,
+                    f"Сайт недоступен\n\n"
+                    f"Ошибка: {str(e)}\n\n"
+                    f"Запусти сайт: python website/app.py"
+                )
+                return
+            
+            await self.bot.send_message(CHAT_ID, "AI анализирует сайт...")
+            
+            scan_data = {
+                'url': website_url,
+                'status_code': status_code,
+                'content_length': len(response.text),
+                'headers': dict(response.headers)
+            }
+            
+            endpoints = []
+            if 'api' in response.text.lower():
+                endpoints.append('/api/status')
+                endpoints.append('/api/users')
+                endpoints.append('/api/data')
+            
+            endpoint_results = []
+            for endpoint in endpoints:
+                try:
+                    ep_response = requests.get(urljoin(website_url, endpoint), timeout=3)
+                    endpoint_results.append({
+                        'endpoint': endpoint,
+                        'status': ep_response.status_code,
+                        'ok': ep_response.status_code == 200
+                    })
+                except:
+                    endpoint_results.append({
+                        'endpoint': endpoint,
+                        'status': 'error',
+                        'ok': False
+                    })
+            
+            prompt = f"""Проанализируй сайт и дай краткий отчет:
+
+URL: {website_url}
+Статус: {status_code}
+Размер: {len(response.text)} байт
+
+Найденные endpoints:
+{chr(10).join([f"- {ep['endpoint']}: {ep['status']}" for ep in endpoint_results])}
+
+Дай краткий анализ:
+1. Общее состояние сайта
+2. Проблемы если есть
+3. Рекомендации по улучшению
+
+Ответ на русском, кратко."""
+
+            ai_analysis = self.ai_analyzer.analyze_with_ollama(prompt)
+            
+            report = f"AI СКАНИРОВАНИЕ САЙТА\n\n"
+            report += f"URL: {website_url}\n"
+            report += f"Статус: {status_code}\n"
+            report += f"Размер: {len(response.text)} байт\n\n"
+            
+            if endpoint_results:
+                report += "Endpoints:\n"
+                for ep in endpoint_results:
+                    icon = "[OK]" if ep['ok'] else "[ERR]"
+                    report += f"{icon} {ep['endpoint']} - {ep['status']}\n"
+                report += "\n"
+            
+            report += f"AI Анализ:\n{ai_analysis}\n"
+            
+            await self.bot.send_message(CHAT_ID, report)
+            
+        except Exception as e:
+            await self.bot.send_message(CHAT_ID, f"Ошибка сканирования: {str(e)}")
+    
     async def send_top_problems(self):
         top_tests = self.db.get_top_failing_tests()
         if not top_tests:
@@ -314,7 +426,7 @@ class AIBrain:
         
         await self.bot.send_message(
             CHAT_ID,
-            "AI-МОЗГ ЗАПУЩЕН\n\n приступай к работе! Используй /start для просмотра команд."
+            "AI-МОЗГ ЗАПУЩЕН\n\nПриступай к работе! Используй /start для просмотра команд."
         )
         
         await self.dp.start_polling(self.bot)
@@ -328,45 +440,70 @@ class AIBrain:
 def select_project_path():
     """Выбор пути к проекту при запуске"""
     print("\n" + "="*60)
-    print("🧠 AI-МОЗГ - Выбор проекта")
+    print("🧠 AI-МОЗГ - Выбор папки с сайтом")
     print("="*60)
     
     current_dir = os.getcwd()
     print(f"\n📍 Текущая директория: {current_dir}")
     
-    print("\nВыбери вариант:")
-    print("1. Использовать текущую директорию (ai-mozg)")
-    print("2. Указать путь к другому проекту")
-    print("3. Выбрать родительскую директорию")
+    # Ищем доступные папки с сайтами
+    available_folders = []
     
-    choice = input("\nТвой выбор (1-3): ").strip()
+    # Проверяем папку website
+    website_dir = os.path.join(current_dir, 'website')
+    if os.path.exists(website_dir):
+        available_folders.append(('website', website_dir))
+    
+    # Проверяем текущую директорию
+    if os.path.exists(os.path.join(current_dir, 'tests')):
+        available_folders.append(('текущая директория', current_dir))
+    
+    print("\n📁 Доступные варианты:")
+    print("1. 🌐 Папка website (рекомендуется)")
+    print("2. 📂 Текущая директория")
+    print("3. ✏️  Указать свой путь")
+    
+    choice = input("\n👉 Твой выбор (1-3): ").strip()
     
     if choice == "1":
+        # Используем папку website
+        project_path = website_dir
+        if not os.path.exists(project_path):
+            print(f"\n⚠️ Папка website не найдена, создаю...")
+            os.makedirs(project_path, exist_ok=True)
+        print(f"✓ Выбрано: {project_path}")
+    
+    elif choice == "2":
+        # Используем текущую директорию
         project_path = current_dir
         print(f"✓ Выбрано: {project_path}")
-    elif choice == "2":
-        project_path = input("Введи полный путь к проекту: ").strip()
-        if not os.path.exists(project_path):
-            print(f"⚠️ Путь не существует: {project_path}")
+    
+    elif choice == "3":
+        # Пользователь указывает свой путь
+        custom_path = input("\n📝 Введи полный путь к папке с сайтом: ").strip()
+        if os.path.exists(custom_path):
+            project_path = custom_path
+            print(f"✓ Выбрано: {project_path}")
+        else:
+            print(f"⚠️ Путь не существует: {custom_path}")
             print("Использую текущую директорию")
             project_path = current_dir
-        else:
-            print(f"✓ Выбрано: {project_path}")
-    elif choice == "3":
-        project_path = os.path.dirname(current_dir)
-        print(f"✓ Выбрано: {project_path}")
-    else:
-        print("⚠️ Неверный выбор, использую текущую директорию")
-        project_path = current_dir
     
-    # Проверка наличия папки tests
+    else:
+        print("⚠️ Неверный выбор, использую папку website")
+        project_path = website_dir
+        if not os.path.exists(project_path):
+            os.makedirs(project_path, exist_ok=True)
+    
+    # Проверяем наличие папки tests
     tests_path = os.path.join(project_path, 'tests')
     if not os.path.exists(tests_path):
         print(f"\n⚠️ Папка 'tests' не найдена в {project_path}")
-        create = input("Создать папку 'tests'? (y/n): ").strip().lower()
-        if create == 'y':
-            os.makedirs(tests_path, exist_ok=True)
-            print(f"✓ Создана папка: {tests_path}")
+        print("📁 Создаю папку 'tests'...")
+        os.makedirs(tests_path, exist_ok=True)
+        print(f"✓ Создана папка: {tests_path}")
+    else:
+        print(f"✓ Найдена папка tests: {tests_path}")
     
     print("\n" + "="*60)
     return project_path

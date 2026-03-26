@@ -233,6 +233,29 @@ class AIErrorAnalyzer:
     @staticmethod
     def get_severity(failure_count):
         return ErrorAnalyzer.get_severity(failure_count)
+    
+    def analyze_with_ollama(self, prompt):
+        """Общий метод для анализа через Ollama"""
+        if not self.client:
+            return "AI не настроен. Запусти: ollama serve"
+        
+        try:
+            response = requests.post(
+                f"{OLLAMA_BASE_URL}/api/generate",
+                json={
+                    "model": AI_MODEL,
+                    "prompt": prompt,
+                    "stream": False
+                },
+                timeout=30
+            )
+            
+            if response.status_code == 200:
+                return response.json().get('response', 'AI не дал ответа')
+            else:
+                return f"Ошибка AI: статус {response.status_code}"
+        except Exception as e:
+            return f"Ошибка подключения к AI: {str(e)}"
 
 
 # ПАРСЕР ОТЧЕТОВ
